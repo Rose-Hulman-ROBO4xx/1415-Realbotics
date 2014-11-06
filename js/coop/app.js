@@ -17,9 +17,24 @@ function handler (req, res) {
   });
 }
 
+var processLine;
+
+var readline = require('readline');
+var rl = readline.createInterface({
+	  input: process.stdin,
+	  output: process.stdout
+});
+
+rl.on('line', function(line){
+	    processLine(line);
+});
+
 io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
+  socket.emit('command', 'Hello, Zhi Li');
   socket.on('my other event', function (data) {
     console.log(data);
   });
+
+  processLine = function(line) { socket.emit('command', 'do the thing! ' + line)};
+
 });
