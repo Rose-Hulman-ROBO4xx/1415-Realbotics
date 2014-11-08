@@ -1,0 +1,22 @@
+<head>
+</head>
+<body>
+<table>
+	<tr>
+		<td> Device name </td>
+		<td> </td>
+		<td> </td>
+	</tr>
+
+	{% for device in devices %}
+	<form action="/device/{{device}}/" method="POST">
+		<tr>
+			<td> {{ device }} </td>
+			<td> <input type="text" name="message" placeholder="command"> </td>
+			<td> <input type="submit"> </td>
+		</tr>
+		{% csrf_token %}
+	</form>
+	{% endfor %}
+</table>
+			
