@@ -6,7 +6,7 @@ from ws4py.server.wsgiutils import WebSocketWSGIApplication
 import re
 import threading
 
-Auth = {'testclient': 'testclienttoken'}
+Auth = {'testclient': 'testclienttoken', 'testclient2': 'testclienttoken'}
 
 class DeviceServer:
 

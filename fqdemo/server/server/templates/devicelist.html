@@ -1,22 +1,47 @@
 <head>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </head>
 <body>
+<div class="container">
+<div class="panel panel-default">
+<div class="panel-body">
 <table>
 	<tr>
 		<td> Device name </td>
 		<td> </td>
 		<td> </td>
+		<td> </td>
+		<td> </td>
 	</tr>
 
 	{% for device in devices %}
+	<tr>
 	<form action="/device/{{device}}/" method="POST">
-		<tr>
 			<td> {{ device }} </td>
 			<td> <input type="text" name="message" placeholder="command"> </td>
 			<td> <input type="submit"> </td>
-		</tr>
 		{% csrf_token %}
 	</form>
+	<form action="/device/{{device}}/" method="POST">
+			<td> <input type="submit" value="on"> </td>
+			<input type="hidden" name="message" value = "on">
+		{% csrf_token %}
+	</form>
+	<form action="/device/{{device}}/" method="POST">
+			<td> <input type="submit" value="off"> </td>
+			<input type="hidden" name="message" value = "off">
+		{% csrf_token %}
+	</form>
+	</tr>
 	{% endfor %}
 </table>
-			
+</div>
+</div>
+</div>
