@@ -5,8 +5,32 @@ from ws4py.server.wsgiutils import WebSocketWSGIApplication
 
 import re
 import threading
+import time
 
 Auth = {'testclient': 'testclienttoken', 'testclient2': 'testclienttoken'}
+
+class CommandHistory:
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.items = list()
+        self.maxSize = 50
+
+    def register(self, sender, target, message):
+        string = '[' + str(int(time.time())) + '] ' + str(sender) + ' -> ' + str(target) + ' : ' + message
+
+        self.lock.acquire()
+        while(len(self.items) > self.maxSize):
+            self.items.pop(0)
+
+        self.items.append(string)
+        self.lock.release()
+
+    def get(self):
+        self.lock.acquire()
+        copy = list(self.items)
+        self.lock.release()
+        return copy
 
 class DeviceServer:
 
@@ -14,6 +38,7 @@ class DeviceServer:
 
         print('Device server starting')
         self.clients = dict()
+        self.history = CommandHistory()
 
         class MockSocket(WebSocket):
 

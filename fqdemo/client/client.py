@@ -2,7 +2,7 @@ from ws4py.client.threadedclient import WebSocketClient
 
 class DummyClient(WebSocketClient):
     def opened(self):
-        self.send('identity testclient')
+        self.send('identity testclient2')
         self.send('token testclienttoken')
 
     def closed(self, code, reason=None):
