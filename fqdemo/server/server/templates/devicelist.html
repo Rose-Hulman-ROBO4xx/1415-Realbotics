@@ -10,42 +10,57 @@
 </head>
 <body>
 <div class="container">
-<div class="panel panel-default">
-<div class="panel-body">
-<table>
-	<tr>
-		<td> Device name </td>
-		<td> </td>
-		<td> </td>
-		<td> </td>
-		<td> </td>
-	</tr>
+<div class="row">
+	<div class="col-xs-6">
+	<div class="panel panel-default">
+	<div class="panel panel-heading">Send commands</div>
+	<div class="panel-body">
+	<table>
+		<tr>
+			<td> Device name </td>
+			<td> </td>
+			<td> </td>
+			<td> </td>
+			<td> </td>
+		</tr>
 
-	{% for device in devices %}
-	<tr>
-	<form action="/device/{{device}}/" method="POST">
-			<td> {{ device }} </td>
-			<td> <input type="text" name="message" placeholder="command"> </td>
-			<td> <input type="submit"> </td>
-		{% csrf_token %}
-	</form>
-	<form action="/device/{{device}}/" method="POST">
-			<td> <input type="submit" value="on"> </td>
-			<input type="hidden" name="message" value = "on">
-		{% csrf_token %}
-	</form>
-	<form action="/device/{{device}}/" method="POST">
-			<td> <input type="submit" value="off"> </td>
-			<input type="hidden" name="message" value = "off">
-		{% csrf_token %}
-	</form>
-	</tr>
-	{% endfor %}
-</table>
-</div>
+		{% for device in devices %}
+		<tr>
+		<form action="/device/{{device}}/" method="POST">
+				<td> {{ device }} </td>
+				<td> <input type="text" name="message" placeholder="command"> </td>
+				<td> <input type="submit"> </td>
+			{% csrf_token %}
+		</form>
+		<form action="/device/{{device}}/" method="POST">
+				<td> <input type="submit" value="on"> </td>
+				<input type="hidden" name="message" value = "on">
+			{% csrf_token %}
+		</form>
+		<form action="/device/{{device}}/" method="POST">
+				<td> <input type="submit" value="off"> </td>
+				<input type="hidden" name="message" value = "off">
+			{% csrf_token %}
+		</form>
+		</tr>
+		{% endfor %}
+	</table>
+	</div>
+	</div>
+	</div>
+
+	<div class="col-xs-6">
+		<div class="panel panel-default">
+		<div class="panel panel-heading">Recent Commands</div>
+		<div class="panel-body">
+			{% for string in history %}
+			{{ string }} <br>
+			{% endfor %}
+		</div>
+		</div>
+	</div>
+
+
 </div>
 </div>
 
-{% for string in history %}
-{{ string }} <br>
-{% endfor %}

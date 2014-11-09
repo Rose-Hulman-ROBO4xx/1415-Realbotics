@@ -11,7 +11,6 @@ def device(request, deviceId):
     message = request.POST.get('message')
     server.clients[deviceId].send(message)
 
-    print request.META
     server.history.register(request.META['REMOTE_ADDR'], deviceId, message)
 
     return redirect('/')
