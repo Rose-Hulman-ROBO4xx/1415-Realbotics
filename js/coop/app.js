@@ -30,9 +30,16 @@ rl.on('line', function(line){
 });
 
 io.on('connection', function (socket) {
+  console.log('client connected');
+
   socket.emit('command', 'Hello, Zhi Li');
-  socket.on('my other event', function (data) {
+
+  socket.on('response', function (data) {
     console.log(data);
+  });
+
+  socket.on('disconnect', function (data) {
+    console.log('client disconnected');
   });
 
   processLine = function(line) { socket.emit('command', 'do the thing! ' + line)};

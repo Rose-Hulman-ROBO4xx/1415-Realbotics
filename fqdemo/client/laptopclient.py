@@ -2,7 +2,7 @@ from ws4py.client.threadedclient import WebSocketClient
 
 class DummyClient(WebSocketClient):
     def opened(self):
-        self.send('identity testclient')
+        self.send('identity testclient2')
         self.send('token testclienttoken')
 
     def closed(self, code, reason=None):
@@ -13,7 +13,7 @@ class DummyClient(WebSocketClient):
 
 if __name__ == '__main__':
     try:
-        ws = DummyClient('ws://localhost:5581/', protocols=['http-only', 'chat'])
+        ws = DummyClient('ws://69.23.211.162:5581/', protocols=['http-only', 'chat'])
         ws.connect()
         ws.run_forever()
     except KeyboardInterrupt:
