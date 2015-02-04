@@ -3,6 +3,9 @@ import socket
 import threading
 import Queue
 import json
+import re
+
+WakeInterval = 0.1
 
 class _JsonSocket:
 
@@ -57,6 +60,9 @@ class _JsonSocket:
         self.recvThread = threading.Thread(target=self._process)
         self.recvThread.start()
 
+    def close():
+        raise Exception()
+
 class RealboticsSocket:
 
     def __init__(self, address, port):
@@ -72,6 +78,52 @@ class RealboticsSocket:
 
     def next(self):
         return self.socket.get()
+
+    def close():
+        raise Exception()
+
+class RealboticsConnection:
+
+    def __init__(self, address='localhost', port=3001):
+        self.commands = []
+        self.commandLock = threading.Lock()
+        self.socket = RealboticsSocket(address, port)
+        self._running = False
+
+    def _proccess_messages(self):
+        while(True):
+            message = self.socket.next()
+            command = self._matchCommand(message)
+            self._execute_command(message, command)
+
+    def _matchCommand(message):
+        with self.commandLock:
+            for command in self.commands:
+                if re.match(command[0], message):
+                    return command[1]
+
+    def _execute_command(message, command):
+        command()
+
+    def on(self, regex, command):
+        self.commandLock.acquire(True)
+        self.commands.append((regex, command))
+        self.commandLock.release()
+
+    def start():
+        self.msgThread - threading.Thread(target=self._process_messages)
+        self._running = True
+        self.msgThread.start()
+
+    def stop():
+        self._running = False
+        self.socket.close()
+        self.msgThread.join()
+
+
+
+
+
 
 def connect(address, port, token):
     s = RealboticsSocket(address, port)
