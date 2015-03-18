@@ -3,15 +3,14 @@ import testserver
 import realbotics
 import time
 
-global globalPort
-globalPort = 26055
+globalPort = 31055
 
 class Tests(unittest.TestCase):
 
     def setUp(self):
         self.address = 'localhost'
-        self.port = globalPort
         global globalPort
+        self.port = globalPort
         globalPort += 1
         self.token = 'some_hardware_token'
         self.server = testserver.TestServer(self.address, self.port)
@@ -21,6 +20,13 @@ class Tests(unittest.TestCase):
     def tearDown(self):
         if(self.client):
             self.client.close()
+        if(self.server):
+            try:
+                self.server.close()
+            except:
+                pass
+        self.server = None
+        time.sleep(0.1)
 
     def testConnection(self):
         self.assertFalse(self.server.connected)

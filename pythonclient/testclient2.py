@@ -1,7 +1,7 @@
 import realbotics
 import time
 
-connection = realbotics.connect('localhost', 3001, 'meow')
+connection = realbotics.connect('localhost', 3001, 'meeeeow')
 
 def p(x):
     print x
