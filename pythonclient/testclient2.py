@@ -10,7 +10,7 @@ connection.on(r'(.*)', p)
 
 try:
     while(True):
-        time.sleep(1)
+        connection.say(raw_input('=> '))
 except KeyboardInterrupt:
     connection.close()
 

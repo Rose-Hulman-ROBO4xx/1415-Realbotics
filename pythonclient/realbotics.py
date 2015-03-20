@@ -98,6 +98,8 @@ class RealboticsSocket:
             self.socket.close()
             raise AuthFailure()
 
+    def send_response(self, value):
+        self.socket.put({'type': 'device_response', 'message': value})
 
     def nextAuth(self, tries):
         if(tries <= 0):
@@ -187,6 +189,9 @@ class RealboticsConnection:
         self._running = False
         self.socket.close()
         self.msgThread.join()
+
+    def say(self, val):
+        self.socket.send_response(val)
 
 
 def connect(address, port, token):
