@@ -13,6 +13,11 @@ class AuthFailure(Exception):
     pass
 
 class _JsonSocket:
+    """
+    This is an implementation of the JSON socket protocol, wherein each
+    message is prefixed by the length of the message, then a #. For example: [1,
+    2, 3] encodes to "7#[1,2,3]"
+    """
 
     def __init__(self):
         self.msgQueue = Queue.Queue(64)
@@ -26,11 +31,13 @@ class _JsonSocket:
         self.open = False
 
     def get(self):
+        """Gets the next complete message, blocking until it is available"""
         if(self.open or (not self.msgQueue.empty())):
             return json.loads(self.msgQueue.get(True, WakeInterval))
         else: raise Closed()
 
     def put(self, message):
+        """Sends a python object across the socket"""
         if(self.open):
             jsonString = json.dumps(message)
             string = str(len(jsonString)) + '#' + jsonString
@@ -50,6 +57,7 @@ class _JsonSocket:
         self.open = False
 
     def _receive(self, char):
+        """State machine for interpereting data from socket"""
         if(self.state == 'count'):
             if(char == '#'):
                 self.remainingCount = int(self.countString)
@@ -68,6 +76,7 @@ class _JsonSocket:
 
 
     def connect(self, address, port):
+        """Connect this socket to an address and port"""
         self.socket = socket.create_connection(('localhost', port))
         self.open = True
         self.recvThread = threading.Thread(target=self._process)
@@ -75,6 +84,7 @@ class _JsonSocket:
         self.running = True
 
     def close(self):
+        """Close this socket"""
         self.open = False
         self.socket.shutdown(socket.SHUT_RDWR)
         self.socket.close()
@@ -82,42 +92,51 @@ class _JsonSocket:
         self.recvThread.join()
 
 class RealboticsSocket:
+    """
+    A socket for connecting to the realbotics server. This is the lower level
+    interface, wherein incoming messages are retrieved by invoking next() on
+    this object.
+    """
 
     def __init__(self, address, port):
         self.address = address
         self.port = port
 
     def connect(self):
+        """Open the connection"""
         self.socket = _JsonSocket()
         self.socket.connect(self.address, self.port)
 
     def authenticate(self, token):
+        """Authenticate with the server, using the token as the hardware authentication token"""
         self.socket.put({'type': 'authenticate', 'hardware_token': token})
-        r = self.nextAuth(5)
+        r = self._nextAuth(5)
         if(not r):
             self.socket.close()
             raise AuthFailure()
 
-    def send_response(self, value):
+    def say(self, value):
+        """Send value to the server"""
         self.socket.put({'type': 'device_response', 'message': value})
 
-    def nextAuth(self, tries):
+    def _nextAuth(self, tries):
         if(tries <= 0):
             return False
         try: 
             a = self.socket.get()
         except Queue.Empty:
-            return self.nextAuth(tries - 1)
+            return self._nextAuth(tries - 1)
 
         if(a['type'] == 'authentication_success'):
             return True
         elif(a['type'] == 'authentication_failure'):
             return False
         else:
-            return self.nextAuth(tries - 1)
+            return self._nextAuth(tries - 1)
 
 
     def next(self):
+        """Returns the next message from the server, blocking until it is available."""
         try:
             a = self.socket.get()
         except Queue.Empty:
@@ -132,6 +151,9 @@ class RealboticsSocket:
         self.socket.close()
 
 class RealboticsConnection:
+    """
+    A higher level interface, which uses callbacks to handle incoming messages
+    """
 
     def __init__(self, token, address='localhost', port=3001):
         self.commands = []
@@ -169,14 +191,25 @@ class RealboticsConnection:
         matchResult[0](*args)
 
     def on(self, regex, command):
+        """
+        Register a method command to be executed on any message matcing a
+        regular expression. If the regex has groups, they will be passed as
+        arguments to the method.
+        """
         self.commandLock.acquire(True)
         self.commands.append((regex, command))
         self.commandLock.release()
 
     def onClose(self, command):
+        """
+        Register a method command to be executed when the connection is closed.
+        """
         self.onCloseFunc = command
 
     def start(self):
+        """
+        Open the connection and send the authentication.
+        """
         self.socket.connect()
         self.socket.authenticate(self.token)
 
@@ -186,15 +219,20 @@ class RealboticsConnection:
 
 
     def close(self):
+        """Close the connection"""
         self._running = False
         self.socket.close()
         self.msgThread.join()
 
     def say(self, val):
-        self.socket.send_response(val)
+        """Send a message to the server"""
+        self.socket.say(val)
 
 
 def connect(address, port, token):
+    """
+    Opens and returns an authenticated RealboticsConnecion
+    """
     s = RealboticsConnection(token, address, port)
     s.start()
     return s

@@ -1,0 +1,80 @@
+Simple example:
+    
+    import time
+    import realbotics
+
+    def action1():
+        print 'doing action 1!'
+
+    def action2():
+        print 'doing action 2!'
+
+    connection = realbotics.connect('localhost', 3001, 'your_hardware_token_here')
+    connection.on('1', action1)
+    connection.on('2', action2)
+
+    while True:
+        time.sleep(1)
+
+This will print "doing action 1" whenever the server sends the command "1", and
+"doing action 2!" whenever the server sends the command "2".
+
+The module exposes two classes, representing a higher and lower level connection
+to a realbotics server. The methods of these classes are detailed as follows:
+
+RealboticsSocket:
+    This is the lower level connection. Incoming messages are stored in a queue,
+    and next() retrieves the next message (blocking until such a message is
+    available.)
+
+    __init__(address, port)
+        constructor
+
+    connect()
+        Opens the connection
+
+    authenticate(token)
+        Authenticates with the server using the specified token. You must
+        authenticate before you will receive any commands from the server.
+
+    say(message)
+        Sends a message back to the server
+
+    next()
+        Returns the next message received from the server. This method will not
+        return until a message has been received (that is, it is a blocking call).
+
+    close()
+        Closes the connection.
+
+RealboticsConnection:
+    This is a higher level connection, which uses callbacks to process incoming
+    messages.
+
+    __init__(token, address, port)
+        constructor
+
+    start()
+        opens the connection and authenticates
+
+    on(regex, command)
+        Whenever a message arrived from server that matches the supplied regex,
+        the method 'command' is executed. If the regex has groups, their values
+        are passed as parameters to the method.
+
+    def onClose(command)
+        The method 'command' will be executed whenever the connection closes.
+
+    def say(message)
+        sends a message back to the server
+
+    def close()
+        Closes the connection
+
+connect(address, port, token):
+    This is a convenience method which opens a connection to the server, starts
+    the connection running, and returns the connection object.
+
+
+    
+    
