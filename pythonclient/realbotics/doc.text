@@ -1,3 +1,5 @@
+Requires ipv6 support for some reason: sudo modprobe ipv6
+
 Simple example:
     
     import time

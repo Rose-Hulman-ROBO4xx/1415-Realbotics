@@ -77,7 +77,7 @@ class _JsonSocket:
 
     def connect(self, address, port):
         """Connect this socket to an address and port"""
-        self.socket = socket.create_connection(('localhost', port))
+        self.socket = socket.create_connection((address, port))
         self.open = True
         self.recvThread = threading.Thread(target=self._process)
         self.recvThread.start()
